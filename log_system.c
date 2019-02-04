@@ -22,7 +22,7 @@ void *log_thread(void)
         log_handle(stack_log, stdout);
         for (i = 0; i < nb_logs_in_stack; i++)
         {
-            *(stack_log + i) = *(stack_log + i + 1);
+        //   *(stack_log + i) = *(stack_log + i + 1); TODO Fix later
         }
     }
 }
@@ -31,17 +31,17 @@ void *log_thread(void)
 int log_add(char* message)
 {
     struct log l = {
-        1,
+        DEBUG,
        time(NULL),
-       "test",
-       "test", // TODO FIX THAT
+       "main.c",
+       "lol",
        "test",
        message
     };
     if (nb_logs_in_stack >= MAX_SIZE_STACK)
         return -1;
-    nb_logs_in_stack++;
     *(stack_log + nb_logs_in_stack) = l;
+    nb_logs_in_stack++;
     return 0;
 }
 /** Handles a log by writing it on output
@@ -50,17 +50,17 @@ void log_handle(struct log *l, struct _IO_FILE *output)
 {
     switch (l->level)
     {
-    ERROR:
-        fprintf(output, "[%f][%s][%s][%s] %s", (double)time(&l->time), l->mod, l->file, l->func, l->data);
+    case ERROR: // TODO Add color
+        fprintf(output, "[%f][%s][%s][%s] %s\n", (double)time(&l->time), l->mod, l->file, l->func, l->data);
         break;
-    WARNING:
-        fprintf(output, "[%f][%s][%s][%s] %s", (double)time(&l->time), l->mod, l->file, l->func, l->data);
+    case WARNING:
+        fprintf(output, "[%f][%s][%s][%s] %s\n", (double)time(&l->time), l->mod, l->file, l->func, l->data);
         break;
-    INFO:
-        fprintf(output, "[%f][%s][%s][%s] %s", (double)time(&l->time), l->mod, l->file, l->func, l->data);
+    case INFO:
+        fprintf(output, "[%f][%s][%s][%s] %s\n", (double)time(&l->time), l->mod, l->file, l->func, l->data);
         break;
-    DEBUG:
-        fprintf(output, "[%f][%s][%s][%s] %s", (double)time(&l->time), l->mod, l->file, l->func, l->data);
+    case DEBUG:
+        fprintf(output, "[%f][%s][%s][%s] %s\n", (double)time(&l->time), l->mod, l->file, l->func, l->data);
         break;
     default:
         break;
