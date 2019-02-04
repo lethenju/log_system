@@ -33,8 +33,8 @@ int log_add(char* message)
     struct log l = {
         1,
        time(NULL),
-       "main.c",
-       "lol",
+       "test",
+       "test", // TODO FIX THAT
        "test",
        message
     };
