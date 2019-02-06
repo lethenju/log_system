@@ -17,6 +17,8 @@ enum log_level
     DEBUG = 3
 };
 
+/** Adds a log in the system
+ */ 
 int log_add(int number_args, int level, const char* file, const char* func, const int line, const char* message, ...);
 
 #define LOG_DEBUG(...) \
@@ -41,8 +43,7 @@ struct log
 /** Initialize the log system
  */
 void log_init();
-/** Adds a log in the system
- */ 
+
 /** Main loop of the log system.
  */
 void *log_thread(void);
