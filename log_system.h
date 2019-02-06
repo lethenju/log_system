@@ -3,12 +3,10 @@
 #include <time.h>
 #include <stdio.h>
 #include <pthread.h>
-#define MAX_SIZE_FUNC 256
-#define MAX_SIZE_FILE 256
-#define MAX_SIZE_MOD 256
-#define MAX_SIZE_DATA 1024
-#define MAX_SIZE_STACK 2048
 
+#define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
+#define NUMARGS(...)  (sizeof((int[]){__VA_ARGS__})/sizeof(int))
+#define MAX_SIZE_STACK 2048
 pthread_t log_pthread;
 
 enum log_level
@@ -19,13 +17,24 @@ enum log_level
     DEBUG = 3
 };
 
+int log_add(int number_args, int level, const char* file, const char* func, const int line, const char* message, ...);
+
+#define LOG_DEBUG(...) \
+    do { log_add(NUMARGS(__VA_ARGS__),DEBUG, __FILE__, __func__, __LINE__, __VA_ARGS__); } while(0)
+#define LOG_INFO(...) \
+    do { log_add(NUMARGS(__VA_ARGS__), INFO, __VA_ARGS__); } while(0)
+#define LOG_WARNING(...) \
+    do { log_add(NUMARGS(__VA_ARGS__), WARNING, __VA_ARGS__); } while(0)
+#define LOG_ERROR(...) \
+    do { log_add(NUMARGS(__VA_ARGS__), ERROR, __VA_ARGS__); } while(0)
+
 struct log
 {
     int level;
     time_t time;
     char *func;
     char *file;
-    char *mod;
+    int line;
     char *data;
 };
 
@@ -34,7 +43,6 @@ struct log
 void log_init();
 /** Adds a log in the system
  */ 
-int log_add(char* message);
 /** Main loop of the log system.
  */
 void *log_thread(void);
