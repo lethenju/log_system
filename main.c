@@ -8,7 +8,8 @@ int main(int argc, char* argv[]) {
     log_init();
     pthread_create(&log_pthread, NULL, (void*) log_thread, (void*) NULL);
     
-    log_add("test"); // Not working for now
+
+    LOG_DEBUG("test %d", 2);
     
     
     pthread_join(log_pthread,NULL);
