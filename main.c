@@ -6,12 +6,16 @@
 
 int main(int argc, char* argv[]) {
     log_init();
-    pthread_create(&log_pthread, NULL, (void*) log_thread, (void*) NULL);
-    
-
-    LOG_DEBUG("test %d", 2);
+    log_add(DEBUG,"test %s","Debug test");
+    usleep(450000);
+    log_add(INFO,"test %s","Info test");
+    usleep(100000);
+    log_add(ERROR,"Error n %d, critical issue %d", 11, 45);
+    usleep(230000);
+    log_add(WARNING,"WARN%cNG",'I');
     
     
     pthread_join(log_pthread,NULL);
+
     return 0;
 }
