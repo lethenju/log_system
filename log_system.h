@@ -5,7 +5,6 @@
 #include <pthread.h>
 
 #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
-#define NUMARGS(...)  (sizeof((int[]){__VA_ARGS__})/sizeof(int))
 #define MAX_SIZE_STACK 2048
 pthread_t log_pthread;
 
@@ -17,33 +16,27 @@ enum log_level
     DEBUG = 3
 };
 
-/** Adds a log in the system
- */ 
-int log_add(int number_args, int level, const char* file, const char* func, const int line, const char* message, ...);
+int log_add(int level, char* format,  ...);
 
-#define LOG_DEBUG(...) \
-    do { log_add(NUMARGS(__VA_ARGS__),DEBUG, __FILE__, __func__, __LINE__, __VA_ARGS__); } while(0)
-#define LOG_INFO(...) \
-    do { log_add(NUMARGS(__VA_ARGS__), INFO, __VA_ARGS__); } while(0)
-#define LOG_WARNING(...) \
-    do { log_add(NUMARGS(__VA_ARGS__), WARNING, __VA_ARGS__); } while(0)
-#define LOG_ERROR(...) \
-    do { log_add(NUMARGS(__VA_ARGS__), ERROR, __VA_ARGS__); } while(0)
+struct log_ctx
+{
+    struct log *stack_log;
+    int nb_logs_in_stack;
+    clock_t begin;
+};
 
 struct log
 {
     int level;
-    time_t time;
-    char *func;
-    char *file;
-    int line;
+    double time;
     char *data;
 };
 
 /** Initialize the log system
  */
 void log_init();
-
+/** Adds a log in the system
+ */ 
 /** Main loop of the log system.
  */
 void *log_thread(void);
