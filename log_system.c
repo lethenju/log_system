@@ -40,7 +40,7 @@ int log_add(int level, char* format, ...)
 
     /* initialize valist for num number of arguments */
     va_start(valist, format);
-    char* msg = (char*) malloc(1024);
+    char* msg = (char*) malloc(strlen(valist)+strlen(format));
     vsprintf(msg, format,valist);
     va_end(valist);
 
@@ -63,7 +63,7 @@ void log_handle(struct log *l, struct _IO_FILE *output)
 {
     switch (l->level)
     {
-    case ERROR: // TODO Add color
+    case ERROR: 
         fprintf(output, "\e[31m[%.2f] %s\e[39m\n", (double)l->time, l->data);
         break;
     case WARNING:
