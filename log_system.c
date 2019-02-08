@@ -2,6 +2,7 @@
 #include "stdio.h"
 #include <stdlib.h>
 #include <stdarg.h>
+#include <string.h>
 
 struct log_ctx *context;
 
@@ -40,7 +41,7 @@ int log_add(int level, char* format, ...)
 
     /* initialize valist for num number of arguments */
     va_start(valist, format);
-    char* msg = (char*) malloc(strlen(valist)+strlen(format));
+    char* msg = (char*) malloc(sizeof(valist)+sizeof(format));
     vsprintf(msg, format,valist);
     va_end(valist);
 
@@ -78,4 +79,13 @@ void log_handle(struct log *l, struct _IO_FILE *output)
     default:
         break;
     }
+    free(l);
+}
+
+void log_end() {
+
+    pthread_join(log_pthread,NULL);
+    free(context->stack_log);
+    free(context);
+
 }

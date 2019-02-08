@@ -44,4 +44,5 @@ void *log_thread(void);
  */
 void log_handle(struct log *l, FILE *output);
 
+void log_end();
 #endif

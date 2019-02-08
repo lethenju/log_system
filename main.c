@@ -2,6 +2,7 @@
  * This file is an example to the log system behaviour. It shows how to initiates it, 
  * and briefly how to use it
  */ 
+#include <time.h>
 #include "log_system.h"
 
 int main(int argc, char* argv[]) {
@@ -15,7 +16,7 @@ int main(int argc, char* argv[]) {
     log_add(WARNING,"WARN%cNG",'I');
     
     
-    pthread_join(log_pthread,NULL);
+    log_end();
 
     return 0;
 }
