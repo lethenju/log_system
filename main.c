@@ -2,7 +2,7 @@
  * This file is an example to the log system behaviour. It shows how to initiates it, 
  * and briefly how to use it
  */ 
-#include <time.h>
+#include <unistd.h>
 #include "log_system.h"
 
 int main(int argc, char* argv[]) {
