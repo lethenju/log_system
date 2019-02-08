@@ -11,9 +11,10 @@ pthread_t log_pthread;
 enum log_level
 {
     ERROR = 0,
-    WARNING = 1,
-    INFO = 2,
-    DEBUG = 3
+    WARNING,
+    INFO,
+    DEBUG,
+    NB_LEVEL
 };
 
 int log_add(int level, char* format,  ...);
