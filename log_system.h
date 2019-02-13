@@ -25,6 +25,7 @@ struct log_ctx
     struct log *stack_log;
     int nb_logs_in_stack;
     clock_t begin;
+    volatile int end;
 };
 
 struct log
