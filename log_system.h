@@ -3,9 +3,10 @@
 #include <time.h>
 #include <stdio.h>
 #include <pthread.h>
-
+#define CONFIG_FILE "log.cfg"
 #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 #define MAX_SIZE_STACK 2048
+#define TIME_BETWEEN_LOGS 100 // time in ms
 pthread_t log_pthread;
 
 enum log_level
