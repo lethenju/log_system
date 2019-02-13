@@ -6,7 +6,6 @@
 
 struct log_ctx *context;
 
-// TODO
 void log_config_load()
 {
     FILE *fd;
@@ -24,6 +23,7 @@ void log_init()
     context->begin = clock();
     context->stack_log = (struct log *)malloc(MAX_SIZE_STACK * sizeof(struct log));
     context->nb_logs_in_stack = 0;
+    context->end = 0;
     pthread_create(&log_pthread, NULL, (void*) log_thread, (void*) NULL);
 }
 /** Main loop of the log system.
@@ -33,7 +33,8 @@ void *log_thread(void)
     int i;
     float pace;
     float wait;
-    while (1)
+    int _continue = 1;
+    while (_continue)
     {
         if (context->nb_logs_in_stack > 0){
             pace = (context->nb_logs_in_stack*100) / (float)MAX_SIZE_STACK;
@@ -48,6 +49,8 @@ void *log_thread(void)
             {
                 *(context->stack_log + i - 1 ) = *(context->stack_log + i); 
             }
+        } else if (context->end) {
+            _continue = 0;
         }
     }
 }
@@ -99,7 +102,7 @@ void log_handle(struct log *l, struct _IO_FILE *output)
 }
 
 void log_end() {
-
+    context->end = 1;
     pthread_join(log_pthread,NULL);
     free(context->stack_log);
     free(context);
