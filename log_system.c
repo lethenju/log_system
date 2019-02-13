@@ -6,6 +6,16 @@
 
 struct log_ctx *context;
 
+// TODO
+void log_config_load()
+{
+    FILE *fd;
+    fd= fopen(CONFIG_FILE,"r");
+   	int c;
+    int key_value=0;
+}
+
+
 /** Initialize the log system
  */
 void log_init()
@@ -21,9 +31,17 @@ void log_init()
 void *log_thread(void)
 {
     int i;
+    float pace;
+    float wait;
     while (1)
     {
         if (context->nb_logs_in_stack > 0){
+            pace = (context->nb_logs_in_stack*100) / (float)MAX_SIZE_STACK;
+            wait =  (pace < 50)* TIME_BETWEEN_LOGS +
+                   (pace >= 50)* (-((float)1/(float)2)*((pace - 50)*(pace - 50))+TIME_BETWEEN_LOGS);
+            if (wait <0) wait =0;
+            usleep((int)(wait*1000));
+            //printf("pace %f, wait %f", pace, wait); 
             log_handle(context->stack_log, stdout);
             context->nb_logs_in_stack--;
             for (i = 1; i < context->nb_logs_in_stack+1; i++)
@@ -44,10 +62,9 @@ int log_add(int level, char* format, ...)
     char* msg = (char*) malloc(sizeof(valist)+sizeof(format));
     vsprintf(msg, format,valist);
     va_end(valist);
-
     struct log l = {
        level,
-       (double)(clock()-context->begin)/CLOCKS_PER_SEC,
+       (double)(clock()-context->begin),
        msg
     };
     if (context->nb_logs_in_stack >= MAX_SIZE_STACK)
@@ -79,7 +96,6 @@ void log_handle(struct log *l, struct _IO_FILE *output)
     default:
         break;
     }
-    free(l);
 }
 
 void log_end() {
