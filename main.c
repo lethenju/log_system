@@ -1,27 +1,32 @@
+/*
+ * This file is an example to the log system behaviour. It shows how to initiates it, 
+ * and briefly how to use it
+ */ 
 #include <unistd.h>
 #include "log_system.h"
+#include "inih/ini.h"
+
+
+
+
 pthread_t test, test2, test3;
 void* thread_test(void) {
     int i;
-    for (i=0; i<100; i++) {
-        usleep(30);
-        log_add(WARNING,"Log number : %d", i);
-    }
-    for (i=0; i<1000; i++) {
+    for (i=0; i<360; i++) {
         usleep(30);
         log_add(WARNING,"Log number : %d", i);
     }
 }
 void* thread_test2(void) {
     int i;
-    for (i=0; i<200; i++) {
+    for (i=0; i<360; i++) {
         usleep(20);
         log_add(ERROR,"Log number : %d", i);
     }
 }
 void* thread_test3(void) {
     int i;
-    for (i=0; i<100; i++) {
+    for (i=0; i<360; i++) {
         usleep(10);
         log_add(INFO,"Log number : %d", i);
     }

@@ -6,12 +6,37 @@
 
 struct log_ctx *context;
 
-void log_config_load()
+
+
+static int handler_ini(void* config, const char* section, const char* name,
+                   const char* value)
 {
-    FILE *fd;
-    fd= fopen(CONFIG_FILE,"r");
-   	int c;
-    int key_value=0;
+    configuration* pconfig = (configuration*)config;
+
+    #define MATCH(s, n) strcmp(section, s) == 0 && strcmp(name, n) == 0
+    if (MATCH("config", "stack_size")) {
+        pconfig->stack_size = atoi(value);
+    } else if (MATCH("config", "write_on_file")) {
+        pconfig->write_on_file = atoi(value);
+    } else if (MATCH("config", "output_file")) {
+        pconfig->output_file = strdup(value);
+    } else {
+        return 0;  /* unknown section/name, error */
+    }
+    return 1;
+}
+
+
+int log_config_load(struct log_ctx* ctx)
+{
+    ctx->config = (configuration*) malloc(sizeof(configuration));
+    if (ini_parse("config.ini", handler_ini, ctx->config) < 0) {
+        printf("Can't load 'config.ini'\n");
+        return -1;
+    }
+    printf("Config loaded from 'test.ini': stack_size=%d, write_on_file=%d, output_file=%s\n",
+        ctx->config->stack_size, ctx->config->write_on_file, ctx->config->output_file);
+    return 0;
 }
 
 
@@ -20,8 +45,16 @@ void log_config_load()
 void log_init()
 {
     context = (struct log_ctx *)malloc(sizeof(struct log_ctx));
+    if (log_config_load(context) == -1) {
+        // Default configuration
+        context->config->stack_size = MAX_SIZE_STACK;
+        context->config->write_on_file = 0;
+        context->config->output_file = "";
+    } else if (context->config->write_on_file) {
+        context->fp = fopen(context->config->output_file, "w");
+    }
     context->begin = clock();
-    context->stack_log = (struct log *)malloc(MAX_SIZE_STACK * sizeof(struct log));
+    context->stack_log = (struct log *)malloc(context->config->stack_size * sizeof(struct log));
     context->nb_logs_in_stack = 0;
     context->end = 0;
     pthread_create(&log_pthread, NULL, (void*) log_thread, (void*) NULL);
@@ -37,13 +70,16 @@ void *log_thread(void)
     while (_continue)
     {
         if (context->nb_logs_in_stack > 0){
-            pace = (context->nb_logs_in_stack*100) / (float)MAX_SIZE_STACK;
+            pace = (context->nb_logs_in_stack*100) / (float)context->config->stack_size;
             wait =  (pace < 50)* TIME_BETWEEN_LOGS +
                    (pace >= 50)* (-((float)1/(float)2)*((pace - 50)*(pace - 50))+TIME_BETWEEN_LOGS);
             if (wait <0) wait =0;
             usleep((int)(wait*1000));
-            //printf("pace %f, wait %f", pace, wait); 
-            log_handle(context->stack_log, stdout);
+            //printf("pace %f, wait %f", pace, wait);
+            if (context->config->write_on_file) 
+                log_handle(context->stack_log, context->fp);
+            else 
+                log_handle(context->stack_log, stdout);                
             context->nb_logs_in_stack--;
             for (i = 1; i < context->nb_logs_in_stack+1; i++)
             {
@@ -67,11 +103,13 @@ int log_add(int level, char* format, ...)
     va_end(valist);
     struct log l = {
        level,
-       (double)(clock()-context->begin),
+       (double)(clock()-context->begin)/(float)CLOCKS_PER_SEC,
        msg
     };
-    if (context->nb_logs_in_stack >= MAX_SIZE_STACK)
+    if (context->nb_logs_in_stack >= context->config->stack_size) {
+        printf("\e[31m[LOG_SYSTEM] NO MORE ROOM IN LOG STACK !\e[39m\n");
         return -1;
+    }
     *(context->stack_log + context->nb_logs_in_stack) = l;
     context->nb_logs_in_stack++;
 
@@ -104,6 +142,8 @@ void log_handle(struct log *l, struct _IO_FILE *output)
 void log_end() {
     context->end = 1;
     pthread_join(log_pthread,NULL);
+    if (context->config->write_on_file)
+        fclose(context->fp);
     free(context->stack_log);
     free(context);
 

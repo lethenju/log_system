@@ -5,7 +5,7 @@
 #include <pthread.h>
 #define CONFIG_FILE "log.cfg"
 #define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
-#define MAX_SIZE_STACK 2048
+#define MAX_SIZE_STACK 10000000
 #define TIME_BETWEEN_LOGS 100 // time in ms
 pthread_t log_pthread;
 
@@ -20,9 +20,20 @@ enum log_level
 
 int log_add(int level, char* format,  ...);
 
+
+typedef struct
+{
+    int stack_size;
+    int write_on_file;
+    const char* output_file;
+} configuration;
+
+
 struct log_ctx
 {
     struct log *stack_log;
+    configuration *config;
+    FILE* fp;
     int nb_logs_in_stack;
     clock_t begin;
     volatile int end;
