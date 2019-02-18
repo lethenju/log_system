@@ -29,9 +29,22 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 ```
+## Config file
 
-## Upcoming features
+Thanks to the module [inih](https://github.com/benhoyt/inih) , there is a configuration file management to control several parameters.
 
-- Config file to manage the stack size and the minimum timing between 2 logs, and how it should react to stack overflow.
-- Output not only on stdout, but also in files
+Here is a example of config file used in the project 
 
+```ini
+; config file for log_system
+
+[config]
+stack_size=4096 ; maximum logs in the stack
+write_on_file=0 ; write on a file instead of stdout
+output_file=logs  ; if write_on_file=1, name of the output file 
+```
+
+
+## Upcoming features 
+
+- Add compile-time options
