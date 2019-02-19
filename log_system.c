@@ -53,8 +53,11 @@ void log_init()
         context->config->stack_size = MAX_SIZE_STACK;
         context->config->write_on_file = 0;
         context->config->output_file = "";
-    } else if (context->config->write_on_file) {
+    } else {
         context->fp = fopen(context->config->output_file, "w");
+        fprintf(context->fp,"========\n");
+        fclose(context->fp);
+
     }
     context->begin = clock();
     context->stack_log = (struct log *)malloc(context->config->stack_size * sizeof(struct log));
@@ -79,8 +82,11 @@ void *log_thread(void)
             if (wait <0) wait =0;
             usleep((int)(wait*1000));
             //printf("pace %f, wait %f", pace, wait);
-            if (context->config->write_on_file) 
+            if (context->config->write_on_file){
+                context->fp = fopen(context->config->output_file, "a");
                 log_handle_file(context->stack_log, context->fp);
+                fclose(context->fp);
+            }
             else 
                 log_handle(context->stack_log, stdout);                
             context->nb_logs_in_stack--;
