@@ -29,6 +29,7 @@ typedef struct
     int write_on_file;
     const char* output_file;
     int smooth_end;
+    int level;
 } configuration;
 
 
@@ -60,4 +61,12 @@ void *log_thread(void);
 /** Wait for the stack to finish then end the process and free the structures
  */ 
 void log_end();
+
+/** Set a new log level
+ */ 
+void set_log_level(int level);
+
+/** Get current log level
+ */ 
+int get_log_level();
 #endif
