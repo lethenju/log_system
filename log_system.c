@@ -1,12 +1,15 @@
 #include "log_system.h"
 #include "stdio.h"
+#include "inih/ini.h"
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
 
 struct log_ctx *context;
 
+void log_handle(struct log *l, FILE *output);
 
+void log_handle_file(struct log *l, FILE *output);
 
 static int handler_ini(void* config, const char* section, const char* name,
                    const char* value)
@@ -77,7 +80,7 @@ void *log_thread(void)
             usleep((int)(wait*1000));
             //printf("pace %f, wait %f", pace, wait);
             if (context->config->write_on_file) 
-                log_handle(context->stack_log, context->fp);
+                log_handle_file(context->stack_log, context->fp);
             else 
                 log_handle(context->stack_log, stdout);                
             context->nb_logs_in_stack--;
@@ -119,7 +122,7 @@ int log_add(int level, char* format, ...)
 /** Handles a log by writing it on output
  */
 void log_handle(struct log *l, struct _IO_FILE *output)
-{
+{   
     switch (l->level)
     {
     case ERROR: 
@@ -133,6 +136,30 @@ void log_handle(struct log *l, struct _IO_FILE *output)
         break;
     case DEBUG:
         fprintf(output, "\e[32m[%.2f] %s\e[39m\n", (double)l->time, l->data);
+        break;
+    default:
+        break;
+    }
+}
+
+
+/** Handles a log by writing it on output
+ */
+void log_handle_file(struct log *l, struct _IO_FILE *output)
+{   
+    switch (l->level)
+    {
+    case ERROR: 
+        fprintf(output, "[%.2f] %s\n", (double)l->time, l->data);
+        break;
+    case WARNING:
+        fprintf(output, "[%.2f] %s\n", (double)l->time, l->data);
+        break;
+    case INFO:
+        fprintf(output, "[%.2f] %s\n", (double)l->time, l->data);
+        break;
+    case DEBUG:
+        fprintf(output, "[%.2f] %s\n", (double)l->time, l->data);
         break;
     default:
         break;

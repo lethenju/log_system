@@ -54,9 +54,6 @@ void log_init();
 /** Main loop of the log system.
  */
 void *log_thread(void);
-/** Handles a log by writing it on output
- */
-void log_handle(struct log *l, FILE *output);
 
 void log_end();
 #endif

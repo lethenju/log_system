@@ -12,21 +12,21 @@
 pthread_t test, test2, test3;
 void* thread_test(void) {
     int i;
-    for (i=0; i<360; i++) {
+    for (i=0; i<10; i++) {
         usleep(30);
         log_add(WARNING,"Log number : %d", i);
     }
 }
 void* thread_test2(void) {
     int i;
-    for (i=0; i<360; i++) {
+    for (i=0; i<10; i++) {
         usleep(20);
         log_add(ERROR,"Log number : %d", i);
     }
 }
 void* thread_test3(void) {
     int i;
-    for (i=0; i<360; i++) {
+    for (i=0; i<10; i++) {
         usleep(10);
         log_add(INFO,"Log number : %d", i);
     }
