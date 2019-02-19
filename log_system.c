@@ -23,6 +23,8 @@ static int handler_ini(void* config, const char* section, const char* name,
         pconfig->write_on_file = atoi(value);
     } else if (MATCH("config", "output_file")) {
         pconfig->output_file = strdup(value);
+    } else if (MATCH("config", "smooth_end")) {
+        pconfig->smooth_end = atoi(value);
     } else {
         return 0;  /* unknown section/name, error */
     }
@@ -53,7 +55,7 @@ void log_init()
         context->config->stack_size = MAX_SIZE_STACK;
         context->config->write_on_file = 0;
         context->config->output_file = "";
-    } else {
+    } else if (context->config->write_on_file){
         context->fp = fopen(context->config->output_file, "w");
         fprintf(context->fp,"========\n");
         fclose(context->fp);
@@ -97,6 +99,10 @@ void *log_thread(void)
         } else if (context->end) {
             _continue = 0;
         }
+        if (!context->config->smooth_end && context->end) {
+            _continue = 0;
+        }
+
     }
 }
 /** Handles a log by writing it on output
@@ -121,8 +127,6 @@ int log_add(int level, char* format, ...)
     }
     *(context->stack_log + context->nb_logs_in_stack) = l;
     context->nb_logs_in_stack++;
-
-   
     return 0;
 }
 /** Handles a log by writing it on output

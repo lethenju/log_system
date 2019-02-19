@@ -18,6 +18,8 @@ enum log_level
     NB_LEVEL
 };
 
+/** Adds a log in the system
+ */ 
 int log_add(int level, char* format,  ...);
 
 
@@ -26,6 +28,7 @@ typedef struct
     int stack_size;
     int write_on_file;
     const char* output_file;
+    int smooth_end;
 } configuration;
 
 
@@ -49,11 +52,12 @@ struct log
 /** Initialize the log system
  */
 void log_init();
-/** Adds a log in the system
- */ 
+
 /** Main loop of the log system.
  */
 void *log_thread(void);
 
+/** Wait for the stack to finish then end the process and free the structures
+ */ 
 void log_end();
 #endif
