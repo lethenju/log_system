@@ -3,8 +3,8 @@
  * and briefly how to use it
  */ 
 #include <unistd.h>
-#include "log_system.h"
-#include "inih/ini.h"
+#include "../src/log_system.h"
+#include "../src/inih/ini.h"
 
 
 
