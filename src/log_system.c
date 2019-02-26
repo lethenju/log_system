@@ -23,6 +23,10 @@ static int handler_ini(void* config, const char* section, const char* name,
         pconfig->write_on_file = atoi(value);
     } else if (MATCH("config", "output_file")) {
         pconfig->output_file = strdup(value);
+    } else if (MATCH("config", "smooth_end")) {
+        pconfig->smooth_end = atoi(value);
+    } else if (MATCH("config", "level")) {
+        pconfig->level = atoi(value);
     } else {
         return 0;  /* unknown section/name, error */
     }
@@ -53,8 +57,11 @@ void log_init()
         context->config->stack_size = MAX_SIZE_STACK;
         context->config->write_on_file = 0;
         context->config->output_file = "";
-    } else if (context->config->write_on_file) {
+    } else if (context->config->write_on_file){
         context->fp = fopen(context->config->output_file, "w");
+        fprintf(context->fp,"========\n");
+        fclose(context->fp);
+
     }
     context->begin = clock();
     context->stack_log = (struct log *)malloc(context->config->stack_size * sizeof(struct log));
@@ -72,25 +79,40 @@ void *log_thread(void)
     int _continue = 1;
     while (_continue)
     {
-        if (context->nb_logs_in_stack > 0){
+        if (context->nb_logs_in_stack > 0)
+        {
             pace = (context->nb_logs_in_stack*100) / (float)context->config->stack_size;
             wait =  (pace < 50)* TIME_BETWEEN_LOGS +
                    (pace >= 50)* (-((float)1/(float)2)*((pace - 50)*(pace - 50))+TIME_BETWEEN_LOGS);
             if (wait <0) wait =0;
             usleep((int)(wait*1000));
-            //printf("pace %f, wait %f", pace, wait);
-            if (context->config->write_on_file) 
-                log_handle_file(context->stack_log, context->fp);
-            else 
-                log_handle(context->stack_log, stdout);                
+            if (context->stack_log->level <= context->config->level) 
+            {
+                if (context->config->write_on_file)
+                {
+                    context->fp = fopen(context->config->output_file, "a");
+                    log_handle_file(context->stack_log, context->fp);
+                    fclose(context->fp);
+                }
+                else 
+                {
+                    log_handle(context->stack_log, stdout);                
+                }
+            }
             context->nb_logs_in_stack--;
             for (i = 1; i < context->nb_logs_in_stack+1; i++)
             {
                 *(context->stack_log + i - 1 ) = *(context->stack_log + i); 
             }
-        } else if (context->end) {
+        } else if (context->end) 
+        {
             _continue = 0;
         }
+        if (!context->config->smooth_end && context->end) 
+        {
+            _continue = 0;
+        }
+
     }
 }
 /** Handles a log by writing it on output
@@ -115,14 +137,13 @@ int log_add(int level, char* format, ...)
     }
     *(context->stack_log + context->nb_logs_in_stack) = l;
     context->nb_logs_in_stack++;
-
-   
     return 0;
 }
 /** Handles a log by writing it on output
  */
 void log_handle(struct log *l, struct _IO_FILE *output)
 {   
+    
     switch (l->level)
     {
     case ERROR: 
@@ -164,6 +185,20 @@ void log_handle_file(struct log *l, struct _IO_FILE *output)
     default:
         break;
     }
+}
+
+/** Set a new log level
+ */ 
+void set_log_level(int level)
+{
+    context->config->level = level;
+}
+
+/** Get current log level
+ */ 
+int get_log_level()
+{
+    return context->config->level;
 }
 
 void log_end() {
