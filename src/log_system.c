@@ -1,6 +1,12 @@
 #include "log_system.h"
 #include "stdio.h"
 #include "inih/ini.h"
+#include <stdio.h> 
+#include <sys/socket.h> 
+#include <stdlib.h> 
+#include <netinet/in.h> 
+#include <string.h> 
+#define PORT 8080 
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
@@ -73,6 +79,37 @@ void log_init()
  */
 void *log_thread(void)
 {
+
+    // init co
+     struct sockaddr_in address; 
+    int sock = 0, valread; 
+    struct sockaddr_in serv_addr; 
+    char *hello = "Hello from client"; 
+    char buffer[1024] = {0}; 
+    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) 
+    { 
+        printf("\n Socket creation error \n"); 
+        return -1; 
+    } 
+   
+    memset(&serv_addr, '0', sizeof(serv_addr)); 
+   
+    serv_addr.sin_family = AF_INET; 
+    serv_addr.sin_port = htons(PORT); 
+       
+    // Convert IPv4 and IPv6 addresses from text to binary form 
+    if(inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr)<=0)  
+    { 
+        printf("\nInvalid address/ Address not supported \n"); 
+        return -1; 
+    } 
+   
+    if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) 
+    { 
+        printf("\nConnection Failed \n"); 
+        return -1; 
+    } 
+    // Co inited
     int i;
     float pace;
     float wait;
@@ -96,7 +133,7 @@ void *log_thread(void)
                 }
                 else 
                 {
-                    log_handle(context->stack_log, stdout);                
+                    log_handle_socket(context->stack_log, sock);                
                 }
             }
             context->nb_logs_in_stack--;
@@ -162,6 +199,34 @@ void log_handle(struct log *l, struct _IO_FILE *output)
         break;
     }
 }
+
+/** Handles a log by writing it on a socket
+ */
+void log_handle_socket(struct log *l, int sock )
+{   
+    char* output = malloc(1024);
+    switch (l->level)
+    {
+    case ERROR: 
+        sprintf(output, "\e[31m[%.2f] %s\e[39m\n", (double)l->time, l->data);
+        break;
+    case WARNING:
+        sprintf(output, "\e[33m[%.2f] %s\e[39m\n", (double)l->time, l->data);
+        break;
+    case INFO:
+        sprintf(output, "\e[34m[%.2f] %s\e[39m\n", (double)l->time, l->data);
+        break;
+    case DEBUG:
+        sprintf(output, "\e[32m[%.2f] %s\e[39m\n", (double)l->time, l->data);
+        break;
+    default:
+        break;
+    }
+    send(sock, output, strlen(output), 0);
+    free(output);
+}
+
+
 
 
 /** Handles a log by writing it on output
