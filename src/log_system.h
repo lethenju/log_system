@@ -9,6 +9,30 @@
 #define TIME_BETWEEN_LOGS 100 // time in ms
 pthread_t log_pthread;
 
+#define DEBUG_TRACE(msg, ...)               \
+    do                                      \
+    {                                       \
+        log_add(DEBUG, msg, ##__VA_ARGS__); \
+    } while (0)
+
+#define INFO_TRACE(msg, ...)               \
+    do                                     \
+    {                                      \
+        log_add(INFO, msg, ##__VA_ARGS__); \
+    } while (0)
+
+#define WARNING_TRACE(msg, ...)               \
+    do                                        \
+    {                                         \
+        log_add(WARNING, msg, ##__VA_ARGS__); \
+    } while (0)
+
+#define ERROR_TRACE(msg, ...)               \
+    do                                      \
+    {                                       \
+        log_add(ERROR, msg, ##__VA_ARGS__); \
+    } while (0)
+
 enum log_level
 {
     ERROR = 0,
@@ -19,25 +43,23 @@ enum log_level
 };
 
 /** Adds a log in the system
- */ 
-int log_add(int level, char* format,  ...);
-
+ */
+int log_add(int level, char *format, ...);
 
 typedef struct
 {
     int stack_size;
     int write_on_file;
-    const char* output_file;
+    const char *output_file;
     int smooth_end;
     int level;
 } configuration;
-
 
 struct log_ctx
 {
     struct log *stack_log;
     configuration *config;
-    FILE* fp;
+    FILE *fp;
     int nb_logs_in_stack;
     clock_t begin;
     volatile int end;
@@ -59,14 +81,14 @@ void log_init();
 void *log_thread(void);
 
 /** Wait for the stack to finish then end the process and free the structures
- */ 
+ */
 void log_end();
 
 /** Set a new log level
- */ 
+ */
 void set_log_level(int level);
 
 /** Get current log level
- */ 
+ */
 int get_log_level();
 #endif
