@@ -14,21 +14,21 @@ void* thread_test(void) {
     int i;
     for (i=0; i<10; i++) {
         usleep(30);
-        log_add(WARNING,"Log number : %d", i);
+        DEBUG_TRACE("Log number : %d", i);
     }
 }
 void* thread_test2(void) {
     int i;
     for (i=0; i<10; i++) {
         usleep(20);
-        log_add(ERROR,"Log number : %d", i);
+        ERROR_TRACE("Omg ! %d", i);
     }
 }
 void* thread_test3(void) {
     int i;
     for (i=0; i<10; i++) {
         usleep(10);
-        log_add(INFO,"Log number : %d", i);
+        INFO_TRACE("Info !!! %d ! ",i);
     }
 }
 

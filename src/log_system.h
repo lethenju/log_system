@@ -9,28 +9,28 @@
 #define TIME_BETWEEN_LOGS 100 // time in ms
 pthread_t log_pthread;
 
-#define DEBUG_TRACE(msg, ...)               \
-    do                                      \
-    {                                       \
-        log_add(DEBUG, msg, ##__VA_ARGS__); \
+#define DEBUG_TRACE(msg, ...)                                             \
+    do                                                                    \
+    {                                                                     \
+        log_add(DEBUG, __LINE__, __FILE__, __func__, msg, ##__VA_ARGS__); \
     } while (0)
 
-#define INFO_TRACE(msg, ...)               \
-    do                                     \
-    {                                      \
-        log_add(INFO, msg, ##__VA_ARGS__); \
+#define INFO_TRACE(msg, ...)                                             \
+    do                                                                   \
+    {                                                                    \
+        log_add(INFO, __LINE__, __FILE__, __func__, msg, ##__VA_ARGS__); \
     } while (0)
 
-#define WARNING_TRACE(msg, ...)               \
-    do                                        \
-    {                                         \
-        log_add(WARNING, msg, ##__VA_ARGS__); \
+#define WARNING_TRACE(msg, ...)                                             \
+    do                                                                      \
+    {                                                                       \
+        log_add(WARNING, __LINE__, __FILE__, __func__, msg, ##__VA_ARGS__); \
     } while (0)
 
-#define ERROR_TRACE(msg, ...)               \
-    do                                      \
-    {                                       \
-        log_add(ERROR, msg, ##__VA_ARGS__); \
+#define ERROR_TRACE(msg, ...)                                             \
+    do                                                                    \
+    {                                                                     \
+        log_add(ERROR, __LINE__, __FILE__, __func__, msg, ##__VA_ARGS__); \
     } while (0)
 
 enum log_level
@@ -44,7 +44,7 @@ enum log_level
 
 /** Adds a log in the system
  */
-int log_add(int level, char *format, ...);
+int log_add(int level, int line, char* file, const char* function, char *format, ...);
 
 typedef struct
 {
@@ -69,6 +69,9 @@ struct log
 {
     int level;
     double time;
+    int line;
+    char *file;
+    const char *func;
     char *data;
 };
 

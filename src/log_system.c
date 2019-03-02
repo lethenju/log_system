@@ -168,7 +168,7 @@ void *log_thread(void)
 }
 /** Handles a log by writing it on output
  */
-int log_add(int level, char *format, ...)
+int log_add(int level, int line, char *file, const char *function, char *format, ...)
 {
     va_list valist;
 
@@ -180,6 +180,9 @@ int log_add(int level, char *format, ...)
     struct log l = {
         level,
         (double)(clock() - context->begin) / (float)CLOCKS_PER_SEC,
+        line,
+        file,
+        function,
         msg};
     if (context->nb_logs_in_stack >= context->config->stack_size)
     {
@@ -221,16 +224,16 @@ void log_handle_socket(struct log *l, int sock)
     switch (l->level)
     {
     case ERROR:
-        sprintf(output, "\e[31m[%.2f] %s\e[39m\n", (double)l->time, l->data);
+        sprintf(output, "\e[31m[%.2f][%s:%d][%s] %s\e[39m\n", (double)l->time, l->file, l->line, l->func, l->data);
         break;
     case WARNING:
-        sprintf(output, "\e[33m[%.2f] %s\e[39m\n", (double)l->time, l->data);
+        sprintf(output, "\e[33m[%.2f][%s:%d][%s] %s\e[39m\n", (double)l->time, l->file, l->line, l->func, l->data);
         break;
     case INFO:
-        sprintf(output, "\e[34m[%.2f] %s\e[39m\n", (double)l->time, l->data);
+        sprintf(output, "\e[34m[%.2f][%s:%d][%s] %s\e[39m\n", (double)l->time, l->file, l->line, l->func, l->data);
         break;
     case DEBUG:
-        sprintf(output, "\e[32m[%.2f] %s\e[39m\n", (double)l->time, l->data);
+        sprintf(output, "\e[32m[%.2f][%s:%d][%s] %s\e[39m\n", (double)l->time, l->file, l->line, l->func, l->data);
         break;
     default:
         break;
