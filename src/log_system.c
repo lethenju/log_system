@@ -47,8 +47,8 @@ int log_config_load(struct log_ctx* ctx)
         printf("Can't load 'config.ini'\n");
         return -1;
     }
-    printf("Config loaded from 'test.ini': stack_size=%d, write_on_file=%d, output_file=%s\n",
-        ctx->config->stack_size, ctx->config->write_on_file, ctx->config->output_file);
+    printf("Config loaded from 'test.ini': stack_size=%d, write_on_file=%d, output_file=%s, level=%d\n",
+        ctx->config->stack_size, ctx->config->write_on_file, ctx->config->output_file, ctx->config->level);
     return 0;
 }
 
@@ -180,7 +180,6 @@ int log_add(int level, char* format, ...)
  */
 void log_handle(struct log *l, struct _IO_FILE *output)
 {   
-    
     switch (l->level)
     {
     case ERROR: 
