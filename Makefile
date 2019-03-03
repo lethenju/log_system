@@ -27,7 +27,7 @@ test: clean_obj log_system.o $(EXAMPLES_DIR)/main.c
 
 ### SERVER TARGET
 
-server: clean_obj log_system_server
+server: setup clean_obj log_system_server
 	@echo "SERVER BUILD DONE"
 
 log_system_server: log_system_server.o
@@ -36,7 +36,8 @@ log_system_server: log_system_server.o
 
 
 ### LIB TARGET
-
+lib: setup clean_obj log_system.o
+	@echo "Log_system built!"
 
 log_system.o: ini.o $(SRC_DIR)/log_system.c  $(SRC_DIR)/log_system.h 
 	gcc -g -c $(SRC_DIR)/log_system.c -o  $(OBJECTS_DIR)/log_system.o
