@@ -3,7 +3,7 @@
  * and briefly how to use it
  */ 
 #include <unistd.h>
-#include "../src/log_system.h"
+#include "log_system.h"
 
 
 

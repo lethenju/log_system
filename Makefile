@@ -12,7 +12,8 @@ OBJECTS_DIR=$(BUILD_DIR)/obj
 EXE_DIR=$(BUILD_DIR)/exe
 SRC_DIR=src
 EXAMPLES_DIR=examples
-
+INC_DIR+=inc
+INC_PARAM=$(foreach d, $(INC_DIR), -I$d)
 
 F1_EXISTS=$(shell [ -e $(BUILD_DIR) ] && echo Y || echo N )
 
@@ -22,7 +23,7 @@ F1_EXISTS=$(shell [ -e $(BUILD_DIR) ] && echo Y || echo N )
 
 # TEST EXAMPLE
 test: clean_obj log_system.o $(EXAMPLES_DIR)/main.c 
-	gcc -g $(EXAMPLES_DIR)/main.c $(OBJECTS_DIR)/* -o $(EXE_DIR)/test_exe -lpthread -lm
+	gcc -g $(EXAMPLES_DIR)/main.c $(INC_PARAM) $(OBJECTS_DIR)/* -o $(EXE_DIR)/test_exe -lpthread -lm
 ### END EXAMPLE TARGETS
 
 ### SERVER TARGET
@@ -39,8 +40,8 @@ log_system_server: log_system_server.o
 lib: setup clean_obj log_system.o
 	@echo "Log_system built!"
 
-log_system.o: ini.o $(SRC_DIR)/log_system.c  $(SRC_DIR)/log_system.h 
-	gcc -g -c $(SRC_DIR)/log_system.c -o  $(OBJECTS_DIR)/log_system.o
+log_system.o: ini.o $(SRC_DIR)/log_system.c  
+	gcc -g -c $(SRC_DIR)/log_system.c $(INC_PARAM) -o  $(OBJECTS_DIR)/log_system.o
 
 
 ini.o: $(SRC_DIR)/inih/ini.c $(SRC_DIR)/inih/ini.h
@@ -48,7 +49,7 @@ ini.o: $(SRC_DIR)/inih/ini.c $(SRC_DIR)/inih/ini.h
 
 
 log_system_server.o: $(SRC_DIR)/log_system_server.c $(SRC_DIR)/log_system.h 
-	gcc -g -c $(SRC_DIR)/log_system_server.c -o  $(OBJECTS_DIR)/log_system_server.o
+	gcc -g -c $(SRC_DIR)/log_system_server.c $(INC_PARAM) -o  $(OBJECTS_DIR)/log_system_server.o
 
 ### END LIB TARGET
 
