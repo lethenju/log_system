@@ -50,6 +50,7 @@ typedef struct
 {
     int stack_size;
     int write_on_file;
+    int write_on_socket;
     const char *output_file;
     int smooth_end;
     int level;
@@ -59,6 +60,7 @@ struct log_ctx
 {
     struct log *stack_log;
     configuration *config;
+    int socket;
     FILE *fp;
     int nb_logs_in_stack;
     clock_t begin;

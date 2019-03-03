@@ -7,11 +7,11 @@
 #include <stdlib.h>
 #include <netinet/in.h>
 #include <string.h>
-#define PORT 8080
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
 #include <unistd.h>
+#define PORT 8080
 
 struct log_ctx *context;
 
@@ -34,6 +34,10 @@ static int handler_ini(void *config, const char *section, const char *name,
     else if (MATCH("config", "write_on_file"))
     {
         pconfig->write_on_file = atoi(value);
+    }
+    else if (MATCH("config", "write_on_socket"))
+    {
+        pconfig->write_on_socket = atoi(value);
     }
     else if (MATCH("config", "output_file"))
     {
@@ -62,8 +66,10 @@ int log_config_load(struct log_ctx *ctx)
         printf("Can't load 'config.ini'\n");
         return -1;
     }
-    printf("Config loaded from 'test.ini': stack_size=%d, write_on_file=%d, output_file=%s, level=%d\n",
-           ctx->config->stack_size, ctx->config->write_on_file, ctx->config->output_file, ctx->config->level);
+    printf("Config loaded from 'config.ini': stack_size=%d, write_on_file=%d,\
+            write_on_socket=%d output_file=%s, level=%d\n",
+           ctx->config->stack_size, ctx->config->write_on_file,
+           ctx->config->write_on_socket, ctx->config->output_file, ctx->config->level);
     return 0;
 }
 
@@ -77,6 +83,7 @@ void log_init()
         // Default configuration
         context->config->stack_size = MAX_SIZE_STACK;
         context->config->write_on_file = 0;
+        context->config->write_on_socket = 0;
         context->config->output_file = "";
     }
     else if (context->config->write_on_file)
@@ -85,10 +92,41 @@ void log_init()
         fprintf(context->fp, "========\n");
         fclose(context->fp);
     }
+    else if (context->config->write_on_socket)
+
+    {
+        // init co
+        struct sockaddr_in address;
+        context->socket = 0;
+        int valread;
+        struct sockaddr_in serv_addr;
+        if ((context->socket = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+        {
+            printf("\n Socket creation error \n");
+        }
+
+        memset(&serv_addr, '0', sizeof(serv_addr));
+
+        serv_addr.sin_family = AF_INET;
+        serv_addr.sin_port = htons(PORT);
+
+        // Convert IPv4 and IPv6 addresses from text to binary form
+        if (inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr) <= 0)
+        {
+            printf("\nInvalid address/ Address not supported \n");
+        }
+
+        if (connect(context->socket, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
+        {
+            printf("\nConnection Failed \n");
+        }
+        // Co inited
+    }
     context->begin = clock();
     context->stack_log = (struct log *)malloc(context->config->stack_size * sizeof(struct log));
     context->nb_logs_in_stack = 0;
     context->end = 0;
+
     pthread_create(&log_pthread, NULL, (void *)log_thread, (void *)NULL);
 }
 /** Main loop of the log system.
@@ -96,33 +134,6 @@ void log_init()
 void *log_thread(void)
 {
 
-    // init co
-    struct sockaddr_in address;
-    int sock = 0, valread;
-    struct sockaddr_in serv_addr;
-    char *hello = "Hello from client";
-    char buffer[1024] = {0};
-    if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-    {
-        printf("\n Socket creation error \n");
-    }
-
-    memset(&serv_addr, '0', sizeof(serv_addr));
-
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(PORT);
-
-    // Convert IPv4 and IPv6 addresses from text to binary form
-    if (inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr) <= 0)
-    {
-        printf("\nInvalid address/ Address not supported \n");
-    }
-
-    if (connect(sock, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
-    {
-        printf("\nConnection Failed \n");
-    }
-    // Co inited
     int i;
     float pace;
     float wait;
@@ -145,9 +156,13 @@ void *log_thread(void)
                     log_handle_file(context->stack_log, context->fp);
                     fclose(context->fp);
                 }
+                else if (context->config->write_on_socket)
+                {
+                    log_handle_socket(context->stack_log, context->socket);
+                }
                 else
                 {
-                    log_handle_socket(context->stack_log, sock);
+                    log_handle(context->stack_log, stdout);
                 }
             }
             context->nb_logs_in_stack--;
