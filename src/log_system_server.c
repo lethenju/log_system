@@ -7,7 +7,7 @@
 #include <string.h> 
 #include "log_system.h"
 #define PORT 8080 
-
+#define MAX_BUFFER_MESSAGES 1024
 
 int main(int argc, char const *argv[]) 
 { 
@@ -56,8 +56,9 @@ int main(int argc, char const *argv[])
     } 
     while (1)
     {
-        valread = read( new_socket , buffer, 1024); 
+        valread = read( new_socket , buffer, MAX_BUFFER_MESSAGES); 
         if (valread) printf("%s",buffer ); 
+        memset(buffer, '\0', MAX_BUFFER_MESSAGES);
     }
     return 0; 
 } 
