@@ -41,7 +41,10 @@ Here is a example of config file used in the project
 [config]
 stack_size=4096 ; maximum logs in the stack
 write_on_file=0 ; write on a file instead of stdout
-output_file=logs  ; if write_on_file=1, name of the output file 
+write_on_socket=1 ; write on a socket instead of stdout
+output_file=test ; if write_on_file=1, name of the output file
+level=4 ; add minimal log level 
+smooth_end=1 ; wait for the end of the logs to end the process
 ```
 
 
