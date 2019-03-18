@@ -147,7 +147,7 @@ void *log_thread(void)
                    (pace >= 50) * (-((float)1 / (float)2) * ((pace - 50) * (pace - 50)) + TIME_BETWEEN_LOGS);
             if (wait < 0)
                 wait = 0;
-            usleep((int)(wait * 1000));
+            nanosleep((int)(wait * 1000 * 1000));
             if (context->stack_log->level <= context->config->level)
             {
                 if (context->config->write_on_file)
