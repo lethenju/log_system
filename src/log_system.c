@@ -189,7 +189,7 @@ int log_add(int level, int line, char *file, const char *function, char *format,
 
     /* initialize valist for num number of arguments */
     va_start(valist, format);
-    char *msg = (char *)malloc(sizeof(valist) + sizeof(format));
+    char *msg = malloc(sizeof(valist) + sizeof(format));
     vsprintf(msg, format, valist);
     va_end(valist);
     struct log l = {
@@ -202,6 +202,7 @@ int log_add(int level, int line, char *file, const char *function, char *format,
     if (context->nb_logs_in_stack >= context->config->stack_size)
     {
         printf("\e[31m[LOG_SYSTEM] NO MORE ROOM IN LOG STACK !\e[39m\n");
+        free(msg);
         return -1;
     }
     *(context->stack_log + context->nb_logs_in_stack) = l;
