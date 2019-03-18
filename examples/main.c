@@ -5,29 +5,25 @@
 #include <unistd.h>
 #include "log_system.h"
 
-
-
-
-
 pthread_t test, test2, test3;
 void* thread_test(void) {
     int i;
     for (i=0; i<10; i++) {
-        usleep(30);
+        nanosleep(30000);
         DEBUG_TRACE("Log number : %d", i);
     }
 }
 void* thread_test2(void) {
     int i;
     for (i=0; i<10; i++) {
-        usleep(20);
+        nanosleep(20000);
         ERROR_TRACE("Omg ! %d", i);
     }
 }
 void* thread_test3(void) {
     int i;
     for (i=0; i<10; i++) {
-        usleep(10);
+        nanosleep(10000);
         INFO_TRACE("Info !!! %d ! ",i);
     }
 }
@@ -39,13 +35,10 @@ int main(int argc, char* argv[]) {
     pthread_create(&test2, NULL, (void*) thread_test2, (void*) NULL);
     pthread_create(&test3, NULL, (void*) thread_test3, (void*) NULL);
 
-    
     pthread_join(test, NULL);
     pthread_join(test2, NULL);
     pthread_join(test3, NULL);
     
-
     log_end();
-
     return 0;
 }
