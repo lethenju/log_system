@@ -46,8 +46,3 @@ output_file=test ; if write_on_file=1, name of the output file
 level=4 ; add minimal log level 
 smooth_end=1 ; wait for the end of the logs to end the process
 ```
-
-
-## Upcoming features 
-
-- Add compile-time options
