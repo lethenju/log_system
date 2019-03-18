@@ -11,12 +11,11 @@
 
 int main(int argc, char const *argv[]) 
 { 
-    int server_fd, new_socket, valread; 
+    int server_fd, new_socket; 
     struct sockaddr_in address; 
     int opt = 1; 
     int addrlen = sizeof(address); 
     char buffer[1024] = {0}; 
-    char *hello = "Hello from server"; 
        
     // Creating socket file descriptor 
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) 
@@ -56,8 +55,7 @@ int main(int argc, char const *argv[])
     } 
     while (1)
     {
-        valread = read( new_socket , buffer, MAX_BUFFER_MESSAGES); 
-        if (valread) printf("%s",buffer ); 
+        if (read( new_socket , buffer, MAX_BUFFER_MESSAGES)) printf("%s",buffer ); 
         memset(buffer, '\0', MAX_BUFFER_MESSAGES);
     }
     return 0; 
