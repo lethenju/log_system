@@ -147,7 +147,8 @@ void *log_thread(void)
                    (pace >= 50) * (-((float)1 / (float)2) * ((pace - 50) * (pace - 50)) + TIME_BETWEEN_LOGS);
             if (wait < 0)
                 wait = 0;
-            nanosleep((int)(wait * 1000 * 1000));
+            nanosleep((const struct timespec[]){{0, (long)(wait * 1000 * 1000)}}, NULL);
+
             if (context->stack_log->level <= context->config->level)
             {
                 if (context->config->write_on_file)
