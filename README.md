@@ -10,7 +10,7 @@ and decide to show only what you need.
 
 But no need of a real project for that, a simple solution is to use macros..
 
-## So whats the problem ?
+## We have a problem
 
 We have all been through the famous situation where a million logs comes in a second
 we need to pause everything and read it through, its going too fast !
@@ -18,7 +18,7 @@ we need to pause everything and read it through, its going too fast !
 Also, imagine you're working on a TUI project. The applications renders in the terminal 
 directly. You can't use your stdout for logging, of course..
 
-## What can I do ?
+## It's time to fix it
 
 Thats where log_system comes handy :
 
@@ -30,7 +30,7 @@ and if a log_system server application is open elsewhere, your logs will come he
 
 You can also choose to write in a file !
 
-## What is log_system actually ?
+## In conclusion
 
 Log_system is a simple module for managing a logging system to log
 your messages on different outputs (files, stdout..)
@@ -38,7 +38,7 @@ your messages on different outputs (files, stdout..)
 It is also a server, to show your log messages in real time in another app !
 (or even remotely if you open your ports ! )
 
-## Usage
+### Usage
 
 Here is a quick example of the usage of the trace system.
 
@@ -62,7 +62,7 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 ```
-## Config file
+### Config file
 
 Thanks to the module [inih](https://github.com/benhoyt/inih) , there is a configuration file management to control several parameters.
 
