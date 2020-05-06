@@ -9,21 +9,21 @@ pthread_t test, test2, test3;
 void* thread_test(void) {
     int i;
     for (i=0; i<10; i++) {
-        nanosleep(30000);
+        nanosleep((const struct timespec[]){{0, (long)(30000)}}, NULL);
         DEBUG_TRACE("Log number : %d", i);
     }
 }
 void* thread_test2(void) {
     int i;
     for (i=0; i<10; i++) {
-        nanosleep(20000);
+        nanosleep((const struct timespec[]){{0, (long)(20000)}}, NULL);
         ERROR_TRACE("Omg ! %d", i);
     }
 }
 void* thread_test3(void) {
     int i;
     for (i=0; i<10; i++) {
-        nanosleep(10000);
+        nanosleep((const struct timespec[]){{0, (long)(10000)}}, NULL);
         INFO_TRACE("Info !!! %d ! ",i);
     }
 }

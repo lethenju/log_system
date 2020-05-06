@@ -10,10 +10,12 @@ set(CMAKE_BUILD_TYPE Debug)
 
 set(LIBRARY_HEADER_FILES
 	src/log_system.h
+	src/inih/ini.h
 )
 
 set(LIBRARY_SOURCE_FILES
 	src/log_system.c
+	src/inih/ini.c
 )
 
 
@@ -47,15 +49,30 @@ set(SERVER_SOURCE_FILES
 	src/log_system_server.c
 )
 
-set(SERVER_INCLUDE_FILE
+set(INCLUDE_FILE
 	inc/log_system.h
 )
 
 add_executable(log_system_server_exe
-	${SERVER_INCLUDE_FILE}
+	${INCLUDE_FILE}
 	${SERVER_SOURCE_FILES}
 )
 
 target_link_libraries(log_system_server_exe
 	log_system
+)	
+
+
+set(EXAMPLE_SOURCE_FILES
+	examples/main.c
+)
+
+add_executable(example_exe
+	${INCLUDE_FILE}
+	${EXAMPLE_SOURCE_FILES}
+)
+
+target_link_libraries(example_exe
+	log_system
+	pthread
 )	
