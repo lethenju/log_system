@@ -8,6 +8,10 @@ include(GNUInstallDirs)
 set(CMAKE_BUILD_TYPE Debug)
 
 
+
+set(CMAKE_SKIP_INSTALL_ALL_DEPENDENCY true)
+
+
 set(LIBRARY_HEADER_FILES
 	src/log_system.h
 	src/inih/ini.h
